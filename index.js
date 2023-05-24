@@ -228,12 +228,11 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { plus100, getRangeProofParamsGetBls12381, getProof, verifyTheProof, getTotalPedCm, verifyPedTotalCm } =
-  nativeBinding
+const { plus100, paramsBn128, proof, verifyTheProof, totalPedCm, verifyPedTotalCm } = nativeBinding
 
 module.exports.plus100 = plus100
-module.exports.getRangeProofParamsGetBls12381 = getRangeProofParamsGetBls12381
-module.exports.getProof = getProof
+module.exports.paramsBn128 = paramsBn128
+module.exports.proof = proof
 module.exports.verifyTheProof = verifyTheProof
-module.exports.getTotalPedCm = getTotalPedCm
+module.exports.totalPedCm = totalPedCm
 module.exports.verifyPedTotalCm = verifyPedTotalCm

@@ -1,10 +1,11 @@
-const { plus100,getRangeProofParamsGetBls12381,getProof,verifyTheProof,getTotalPedCm,verifyPedTotalCm } = require('./index')
+const { plus100,paramsBn128,proof,verifyTheProof,totalPedCm,verifyPedTotalCm } = require('./index')
+
 
 
 // console.assert(plus100(0) === 100, 'Simple test failed')
-// console.log(getRangeProofParamsGetBls12381());
-// console.log(getProof("dong","222"));
-// console.log(verifyTheProof("dong"));
+console.log(paramsBn128(11));
+console.log(proof("dong","222",11));
+console.log(verifyTheProof("dong"));
 // console.log(getTotalPedCm(["Kim","dong"]));
-console.log(verifyPedTotalCm());
+// console.log(verifyPedTotalCm());
 // console.info('Simple test passed')

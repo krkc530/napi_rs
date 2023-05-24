@@ -18,6 +18,7 @@ use std::fs::{read, write};
 pub fn make_proof<E: Pairing, I: IntoIterator<Item = (String, Vec<E::ScalarField>)>>(
   inputs: I,
   name: &str,
+  seed: u32,
 ) {
   let mut circuit =
     CircomCircuit::<E>::from_r1cs_file(abs_path("./circom/bn128/range_proof.r1cs")).unwrap();
@@ -48,7 +49,7 @@ pub fn make_proof<E: Pairing, I: IntoIterator<Item = (String, Vec<E::ScalarField
     .take(1)
     .collect::<Vec<_>>();
   // Randomness for the committed witness in proof.d
-  let mut rng = StdRng::seed_from_u64(300u64);
+  let mut rng = StdRng::seed_from_u64(seed.into());
   let v = E::ScalarField::rand(&mut rng);
   let proof = create_random_proof(circuit, v, &params, &mut rng).unwrap();
   // println!("{:?}", proof);

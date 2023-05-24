@@ -31,8 +31,9 @@ pub fn get_link_public_gens<R: RngCore, E: Pairing>(
 pub fn gen_params<E: Pairing>(
   commit_witness_count: usize,
   circuit: CircomCircuit<E>,
+  seed: u32,
 ) -> (ProvingKeyWithLink<E>, ProvingKey<E>) {
-  let mut rng = StdRng::seed_from_u64(0);
+  let mut rng = StdRng::seed_from_u64(seed.into());
   let link_gens = get_link_public_gens(&mut rng, commit_witness_count + 1);
   let params_link = generate_random_parameters_incl_cp_link::<E, _, _>(
     circuit.clone(),
@@ -48,12 +49,12 @@ pub fn gen_params<E: Pairing>(
   (params_link, params)
 }
 
-pub fn get_params<E: Pairing>(r1cs_file_path: &str) {
+pub fn get_params<E: Pairing>(r1cs_file_path: &str, seed: u32) {
   // 파일로 부터 circuit 구성
   let circuit = CircomCircuit::<E>::from_r1cs_file(abs_path(r1cs_file_path)).unwrap();
 
   // params 구성
-  let (_, params) = gen_params::<E>(1, circuit.clone());
+  let (_, params) = gen_params::<E>(1, circuit.clone(), seed);
 
   let mut compressed_bytes: Vec<u8> = Vec::new();
   params.serialize_compressed(&mut compressed_bytes).unwrap();
