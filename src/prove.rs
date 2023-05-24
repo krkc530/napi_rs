@@ -28,7 +28,7 @@ pub fn make_proof<E: Pairing, I: IntoIterator<Item = (String, Vec<E::ScalarField
   let params: ProvingKey<E> = ProvingKey::<E>::deserialize_compressed(&*tmp_params).unwrap();
 
   let mut wits_calc =
-    WitnessCalculator::<E>::from_wasm_file("./circom/bn128/range_proof.wasm").unwrap();
+    WitnessCalculator::<E>::from_wasm_file(abs_path("./circom/bn128/range_proof.wasm")).unwrap();
   let all_wires = wits_calc.calculate_witnesses::<I>(inputs, true).unwrap();
 
   assert_eq!(wits_calc.instance.get_input_count().unwrap(), 1);
