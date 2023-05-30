@@ -303,7 +303,7 @@ pub fn sigma_protocol<E: Pairing>(cm: E::G1Affine) -> Result<(), Error> {
 
   object_writer.end();
 
-  let mut file = File::create("./json/Ped_cm/Sigma_proof.json")?;
+  let mut file = File::create(abs_path("./json/Ped_cm/Sigma_proof.json"))?;
   file.write_all(object_str.as_bytes())
 }
 
