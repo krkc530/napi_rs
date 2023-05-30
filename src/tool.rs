@@ -248,7 +248,7 @@ pub struct SigmaProof<E: Pairing> {
 }
 
 pub fn sigma_protocol<E: Pairing>(cm: E::G1Affine) -> Result<(), Error> {
-  let cm_key_data: Vec<u8> = read(abs_path("./proof_file/CM_Key_total.bin")).unwrap();
+  let cm_key_data: Vec<u8> = read(abs_path("./proof_file/CM_total_key.bin")).unwrap();
   let cm_key: CMKey<E> = CMKey::deserialize_compressed(&*cm_key_data).unwrap();
 
   let g: E::G1Affine = cm_key.gamma_abc_g1;

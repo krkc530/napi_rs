@@ -9,11 +9,4 @@ export function proof(name: string, value: string, seed: number): void
 export function verifyTheProof(name: string): void
 export function totalPedCm(nameList: Array<string>): void
 export function verifyPedTotalCm(): void
-
-
-
-
-
-
-
-
+export function sigmaTotal(): void

@@ -228,7 +228,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { plus100, paramsBn128, proof, verifyTheProof, totalPedCm, verifyPedTotalCm } = nativeBinding
+const { plus100, paramsBn128, proof, verifyTheProof, totalPedCm, verifyPedTotalCm, sigmaTotal } = nativeBinding
 
 module.exports.plus100 = plus100
 module.exports.paramsBn128 = paramsBn128
@@ -236,3 +236,4 @@ module.exports.proof = proof
 module.exports.verifyTheProof = verifyTheProof
 module.exports.totalPedCm = totalPedCm
 module.exports.verifyPedTotalCm = verifyPedTotalCm
+module.exports.sigmaTotal = sigmaTotal
