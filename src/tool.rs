@@ -1,11 +1,13 @@
 use ark_ec::{pairing::Pairing, AffineRepr, CurveGroup, VariableBaseMSM};
-use ark_ff::PrimeField;
+use ark_ff::fields::PrimeField;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
-use ark_std::{ops::AddAssign, ops::Neg, Zero};
+use ark_std::{ops::AddAssign, ops::Neg, UniformRand, Zero};
 use json_writer::JSONObjectWriter;
 use legogroth16::{Proof, VerifyingKey};
+use std::collections::hash_map::DefaultHasher;
 use std::fs::File;
 use std::fs::{read, write};
+use std::hash::Hasher;
 use std::io::{Error, Write};
 use std::path::PathBuf;
 
@@ -90,24 +92,6 @@ pub fn get_sum_of_value_pedersen_cm<E: Pairing>(name_list: Vec<String>) {
   let mut file = File::create(abs_path("./json/Ped_cm/CM_total.json")).expect("ERR");
   let _ = file.write_all(object_str.as_bytes());
 }
-
-// pub fn update_sum_of_cm<E: Pairing>(name: &str) {
-//   let total_cm: Vec<u8> = read(abs_path("./proof_file/CM_total.bin")).unwrap();
-//   let cm: ark_ec::short_weierstrass::Affine<ark_bn254::g1::Config> =
-//     <G1Affine>::deserialize_compressed(&*total_cm).unwrap();
-
-//   let mut cm_path = String::new();
-
-//   cm_path.push_str("./CM_list/CM_");
-//   cm_path.push_str(name);
-//   cm_path.push_str(".bin");
-
-//   let mut name_cm_vec: Vec<u8>;
-//   let mut name_cm: <E as Pairing>::G1Affine;
-
-//   name_cm_vec = read(abs_path(cm_path.as_str())).unwrap();
-//   name_cm = <E as Pairing>::G1Affine::deserialize_compressed(&*name_cm_vec).unwrap();
-// }
 
 pub fn add_cm<E: Pairing>(a: E::G1Affine, b: E::G1Affine) -> E::G1Affine {
   (a + b).into()
@@ -257,8 +241,86 @@ pub fn verify_cm<E: Pairing>(
   Ok(())
 }
 
+#[derive(CanonicalSerialize, CanonicalDeserialize, Debug)]
+pub struct SigmaProof<E: Pairing> {
+  pub t: E::G1Affine,
+  pub s: E::ScalarField,
+}
+
+pub fn sigma_protocol<E: Pairing>(cm: E::G1Affine) -> Result<(), Error> {
+  let cm_key_data: Vec<u8> = read(abs_path("./proof_file/CM_Key_total.bin")).unwrap();
+  let cm_key: CMKey<E> = CMKey::deserialize_compressed(&*cm_key_data).unwrap();
+
+  let g: E::G1Affine = cm_key.gamma_abc_g1;
+  let h: E::G1Affine = cm_key.eta_gamma_inv_g1;
+  let v: E::ScalarField = cm_key.v;
+  let r: E::ScalarField = cm_key.w;
+
+  let g_v: E::G1Affine = (g * v).into();
+
+  // y = cm * (g^v(^-1)) = h^r
+  // prove y = h^r
+  let y: E::G1Affine = (cm + g_v.into_group().neg().into_affine()).into();
+
+  // random
+  let random: E::ScalarField = UniformRand::rand(&mut ark_std::test_rng());
+
+  // t = h^random
+  let t: E::G1Affine = (h * random).into();
+
+  // c = Hash(h,y,t)
+
+  let hasher = DefaultHasher::new();
+
+  let mut h_data: Vec<u8> = Vec::new();
+  h.serialize_uncompressed(&mut h_data).unwrap();
+  let mut y_data: Vec<u8> = Vec::new();
+  y.serialize_uncompressed(&mut y_data).unwrap();
+  let mut t_data: Vec<u8> = Vec::new();
+  t.serialize_uncompressed(&mut t_data).unwrap();
+
+  let mut input = Vec::new();
+  input.extend(h_data);
+  input.extend(y_data);
+  input.extend(t_data);
+
+  let c = hasher.finish();
+
+  // s = random + c * r;
+
+  //BigInt::from(c).into_bigint()
+  let tmp = E::ScalarField::from_be_bytes_mod_order(&(c.to_le_bytes()));
+
+  let s: E::ScalarField = random + tmp * r;
+
+  // save proof (t,s) as json
+
+  let mut object_str = String::new();
+  let mut object_writer = JSONObjectWriter::new(&mut object_str);
+
+  object_writer.value("t", t.to_string().as_str());
+  object_writer.value("s", s.to_string().as_str());
+
+  object_writer.end();
+
+  let mut file = File::create("./json/Ped_cm/Sigma_proof.json")?;
+  file.write_all(object_str.as_bytes())
+}
+
 pub fn abs_path(relative_path: &str) -> String {
   let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
   path.push(relative_path);
   path.to_string_lossy().to_string()
 }
+
+// let mut h_data: Vec<u8> = Vec::new();
+// h.serialize_uncompressed(&mut h_data).unwrap();
+// let mut y_data: Vec<u8> = Vec::new();
+// y.serialize_uncompressed(&mut y_data).unwrap();
+// let mut t_data: Vec<u8> = Vec::new();
+// t.serialize_uncompressed(&mut t_data).unwrap();
+
+// let mut input = Vec::new();
+// input.extend(h_data);
+// input.extend(y_data);
+// input.extend(t_data);

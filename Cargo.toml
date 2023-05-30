@@ -39,6 +39,7 @@ json = "0.12.4"
 json-writer = "0.2.1"
 serde = "1.0.163"
 pairing = "0.20"
+crypto-hash = "0.3.4"
 
 [build-dependencies]
 napi-build = "2"

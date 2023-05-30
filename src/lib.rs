@@ -17,8 +17,17 @@ mod verify;
 
 use crate::prove::make_proof;
 use crate::setup::get_params;
-use crate::tool::{abs_path, get_sum_of_value_pedersen_cm, verify_cm, CMKey};
+use crate::tool::{abs_path, get_sum_of_value_pedersen_cm, sigma_protocol, verify_cm, CMKey};
 use crate::verify::verify;
+
+#[test]
+pub fn test_sigma_protocol() {
+  let cm_data = read(abs_path("./proof_file/CM_dong.bin")).unwrap();
+  let cm: <Bn254 as Pairing>::G1Affine =
+    <Bn254 as Pairing>::G1Affine::deserialize_compressed(&*cm_data).unwrap();
+
+  let _ = sigma_protocol::<Bn254>(cm);
+}
 
 #[napi]
 pub fn plus_100(input: u32) -> u32 {
@@ -74,4 +83,13 @@ fn verify_ped_total_cm() {
     cm_key.v,
     cm,
   );
+}
+
+#[napi]
+fn sigma_total() {
+  let cm_data = read(abs_path("./proof_file/CM_total.bin")).unwrap();
+  let cm: <Bn254 as Pairing>::G1Affine =
+    <Bn254 as Pairing>::G1Affine::deserialize_compressed(&*cm_data).unwrap();
+
+  let _ = sigma_protocol::<Bn254>(cm);
 }
