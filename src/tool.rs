@@ -118,6 +118,21 @@ pub fn save_verify_key_as_json<E: Pairing>(vk: VerifyingKey<E>) -> Result<(), Er
   file.write_all(object_str.as_bytes())
 }
 
+pub fn save_generator_as_json<E: Pairing>(vk: VerifyingKey<E>) -> Result<(), Error> {
+  let mut object_str = String::new();
+
+  let mut object_writer = JSONObjectWriter::new(&mut object_str);
+
+  let g1: String = vk.gamma_abc_g1.iter().map(|&s| s.to_string()).collect();
+
+  object_writer.value("gamma_abc_g1", g1.as_str());
+  object_writer.value("gamma_g2", vk.gamma_g2.to_string().as_str());
+  object_writer.end();
+
+  let mut file = File::create(abs_path("./json/Ped_cm/generator.json"))?;
+  file.write_all(object_str.as_bytes())
+}
+
 pub fn save_proof_as_json<E: Pairing>(proof: Proof<E>, name: &str) -> Result<(), Error> {
   let mut object_str = String::new();
 

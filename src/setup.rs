@@ -10,7 +10,7 @@ use legogroth16::{
 };
 use std::fs::write;
 
-use crate::tool::{abs_path, save_verify_key_as_json};
+use crate::tool::{abs_path, save_generator_as_json, save_verify_key_as_json};
 
 pub fn get_link_public_gens<R: RngCore, E: Pairing>(
   rng: &mut R,
@@ -70,4 +70,5 @@ pub fn get_params<E: Pairing>(r1cs_file_path: &str, seed: u32) {
   write(abs_path("./proof_file/verify_key.bin"), &compressed_bytes).unwrap();
 
   assert_eq!(save_verify_key_as_json((params.vk).clone()).is_ok(), true);
+  assert_eq!(save_generator_as_json((params.vk).clone()).is_ok(), true);
 }
