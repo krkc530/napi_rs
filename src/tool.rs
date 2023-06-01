@@ -123,9 +123,9 @@ pub fn save_generator_as_json<E: Pairing>(vk: VerifyingKey<E>) -> Result<(), Err
 
   let mut object_writer = JSONObjectWriter::new(&mut object_str);
 
-  let g1: String = vk.gamma_abc_g1.iter().map(|&s| s.to_string()).collect();
+  // let g1: String = vk.gamma_abc_g1.iter().map(|&s| s.to_string()).collect();
 
-  object_writer.value("gamma_abc_g1", g1.as_str());
+  object_writer.value("gamma_abc_g1", vk.gamma_abc_g1[1].to_string().as_str());
   object_writer.value("gamma_g2", vk.gamma_g2.to_string().as_str());
   object_writer.end();
 
