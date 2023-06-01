@@ -126,7 +126,7 @@ pub fn save_generator_as_json<E: Pairing>(vk: VerifyingKey<E>) -> Result<(), Err
   // let g1: String = vk.gamma_abc_g1.iter().map(|&s| s.to_string()).collect();
 
   object_writer.value("gamma_abc_g1", vk.gamma_abc_g1[1].to_string().as_str());
-  object_writer.value("gamma_g2", vk.gamma_g2.to_string().as_str());
+  object_writer.value("eta_gamma_inv_g1", vk.eta_gamma_inv_g1.to_string().as_str());
   object_writer.end();
 
   let mut file = File::create(abs_path("./json/Ped_cm/generator.json"))?;
